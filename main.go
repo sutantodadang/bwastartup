@@ -26,7 +26,7 @@ func main()  {
 	userService := user.NewService(userRepo)
 
 	userHandler := handler.NewUserHandler(userService)
-	
+
 	// userInput := user.RegisterUserInput{
 	// 	Name: "sutanto",
 	// 	Email: "sutanto@mail.com",
@@ -55,6 +55,7 @@ func main()  {
 
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
+	api.POST("/email_checkers", userHandler.CheckEmailAvailibity)
 
 	router.Run()
 }
