@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bwastartup/auth"
 	"bwastartup/helper"
 	"bwastartup/user"
 	"fmt"
@@ -11,10 +12,11 @@ import (
 
 type userHandler struct{
 	userService user.Service
+	authServicce auth.Service
 }
 
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
@@ -40,10 +42,15 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 	}
 
 	// token
+	token, err := h.authServicce.GenerateToken(newUser.Id)
+	if err != nil {
+		res := helper.APIResponse("Register Account Failed",http.StatusBadRequest,"Error",nil)
 
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
 
-
-	formatter := user.FormatUser(newUser, "token cuyyy")
+	formatter := user.FormatUser(newUser, token)
 
 	res := helper.APIResponse("Your Account Has Been Created", http.StatusOK,"success", formatter)
 
@@ -74,7 +81,16 @@ func (h *userHandler) Login(c *gin.Context)  {
 		return
 	}
 
-	formatter := user.FormatUser(loggedInUser, "token cuyyy")
+	// token
+	token, err := h.authServicce.GenerateToken(loggedInUser.Id)
+	if err != nil {
+		res := helper.APIResponse("Login Failed",http.StatusBadRequest,"Error",nil)
+
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	formatter := user.FormatUser(loggedInUser, token)
 
 
 	res := helper.APIResponse("Login Success", http.StatusOK,"success", formatter)
