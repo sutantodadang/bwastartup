@@ -63,6 +63,7 @@ func main()  {
 	// fmt.Println("Isi slicenya : ", len(users))
 
 	router := gin.Default()
+	router.Static("/images","./images")
 
 	// router.GET("/handler",handler)
 	api := router.Group("api/v1")
