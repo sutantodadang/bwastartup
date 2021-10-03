@@ -2,6 +2,7 @@ package main
 
 import (
 	"bwastartup/auth"
+	"bwastartup/campaign"
 	"bwastartup/handler"
 	"bwastartup/helper"
 	"bwastartup/user"
@@ -28,10 +29,16 @@ func main()  {
 	fmt.Println("Database Terkoneksi")
 
 	userRepo := user.NewRepository(db)
+	campaignRepo := campaign.NewRepository(db)
+
 	userService := user.NewService(userRepo)
+	campaignService := campaign.NewService(campaignRepo)
 	authService := auth.NewService()
 
+	
+
 	userHandler := handler.NewUserHandler(userService, authService)
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 
 	// userInput := user.RegisterUserInput{
@@ -64,6 +71,7 @@ func main()  {
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailibity)
 	api.POST("/avatars", authMiddleware(authService,userService), userHandler.UploadAvatar)
+	api.GET("/campaigns", campaignHandler.GetCampaigns)
 
 	router.Run()
 }
